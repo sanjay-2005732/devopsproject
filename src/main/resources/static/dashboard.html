@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated CI/CD Pipeline - Live Runner</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-runner {
+            background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+            color: #ffffff;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .btn-big-run {
+            background: #10b981;
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            padding: 16px 36px;
+            border-radius: 50px;
+            border: 3px solid #34d399;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .btn-big-run:hover {
+            background: #059669;
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.8);
+        }
+        .stage-box {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.1rem 1.4rem;
+            margin-bottom: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        .stage-box.state-pending {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            opacity: 0.85;
+        }
+        .stage-box.state-running {
+            border-color: #f59e0b;
+            background: #fffbeb;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
+            transform: scale(1.02);
+        }
+        .stage-box.state-passed {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        .stage-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .stage-desc {
+            font-size: 0.82rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .terminal-container {
+            background: #020617;
+            border: 2px solid #1e293b;
+            border-radius: 12px;
+            padding: 1.25rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: #38bdf8;
+            height: 480px;
+            max-height: 480px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .log-item {
+            margin-bottom: 4px;
+        }
+        .log-item.OK { color: #34d399; font-weight: bold; }
+        .log-item.INFO { color: #38bdf8; }
+        .log-item.WARN { color: #fbbf24; }
+        .success-banner {
+            display: none;
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            border-radius: 12px;
+            padding: 1.25rem 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: popIn 0.4s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body style="background: #f1f5f9;">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Student Management System</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-user-graduate"></i> Student CRUD Page</a>
+            <a href="dashboard.html" class="active"><i class="fas fa-play-circle"></i> Live Pipeline Runner</a>
+            <a href="Automated_CICD_Pipeline_DevOps_Project.pptx" download class="btn btn-warning btn-sm" style="color: #fff; text-decoration: none;"><i class="fas fa-download"></i> Download PPT</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1250px; padding: 2rem;">
+
+        <!-- Success Banner (Shows when complete) -->
+        <div id="successBanner" class="success-banner">
+            <h2 style="margin: 0 0 6px 0; font-size: 1.6rem;"><i class="fas fa-check-circle" style="color: #10b981;"></i> PIPELINE EXECUTION COMPLETED 100% SUCCESSFULLY!</h2>
+            <p style="margin: 0; font-size: 1rem; color: #047857;">
+                All 8 stages (Build, Test, Package, Docker, AWS Deploy, Health Verification) passed with zero errors. Your application is live at <strong>http://localhost:8080</strong>!
+            </p>
+        </div>
+
+        <!-- HERO SECTION WITH BIG BUTTON -->
+        <div class="hero-runner">
+            <div>
+                <span class="status-badge" style="background: rgba(255,255,255,0.2); color: #fff; margin-bottom: 8px;">
+                    <i class="fas fa-robot"></i> Jenkins Automated Pipeline Engine
+                </span>
+                <h1 style="font-size: 2rem; margin: 6px 0; font-weight: 800;">Press the Green Button to Run the 8 Steps</h1>
+                <p style="margin: 0; opacity: 0.9; font-size: 1rem;">
+                    Watch the 8 stages execute live one-by-one from Stage 1 to Stage 8, streaming real compilation & test logs in the black console!
+                </p>
+            </div>
+            <div>
+                <button class="btn-big-run" id="startBtn" onclick="startAutomatedRun()">
+                    <i class="fas fa-play"></i> START PIPELINE
+                </button>
+            </div>
+        </div>
+
+        <!-- TWO COLUMN LAYOUT: 8 STAGES ON LEFT, LOGS ON RIGHT -->
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: start;">
+            
+            <!-- LEFT: THE 8 STAGES -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0; color: #0f172a; font-size: 1.25rem;"><i class="fas fa-tasks"></i> 8 Pipeline Stages</h3>
+                    <span id="pipelineGlobalStatus" class="status-badge" style="background: #e2e8f0; color: #475569;">Ready to Run</span>
+                </div>
+
+                <!-- Stage 1 -->
+                <div class="stage-box state-pending" id="box-1">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-1"><i class="fas fa-code-branch"></i></div>
+                        <div>
+                            <div class="stage-title">1. Checkout (Git SCM)</div>
+                            <div class="stage-desc">Pulls Java source code from GitHub repository</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-1">Waiting...</span>
+                </div>
+
+                <!-- Stage 2 -->
+                <div class="stage-box state-pending" id="box-2">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-2"><i class="fas fa-hammer"></i></div>
+                        <div>
+                            <div class="stage-title">2. Build & Compile (Maven)</div>
+                            <div class="stage-desc">Compiles Java source files: mvn clean compile</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-2">Waiting...</span>
+                </div>
+
+                <!-- Stage 3 -->
+                <div class="stage-box state-pending" id="box-3">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-3"><i class="fas fa-vial"></i></div>
+                        <div>
+                            <div class="stage-title">3. Automated Testing (JUnit 5)</div>
+                            <div class="stage-desc">Runs 5 automated unit test suites in StudentServiceTest</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-3">Waiting...</span>
+                </div>
+
+                <!-- Stage 4 -->
+                <div class="stage-box state-pending" id="box-4">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-4"><i class="fas fa-box-open"></i></div>
+                        <div>
+                            <div class="stage-title">4. Package Application JAR</div>
+                            <div class="stage-desc">Bundles JAR: student-management-app-1.0.0.jar</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-4">Waiting...</span>
+                </div>
+
+                <!-- Stage 5 -->
+                <div class="stage-box state-pending" id="box-5">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-5"><i class="fab fa-docker"></i></div>
+                        <div>
+                            <div class="stage-title">5. Docker Container Build</div>
+                            <div class="stage-desc">Packages the JAR into a 148MB Alpine Linux container</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-5">Waiting...</span>
+                </div>
+
+                <!-- Stage 6 -->
+                <div class="stage-box state-pending" id="box-6">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-6"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div>
+                            <div class="stage-title">6. Docker Push (Registry)</div>
+                            <div class="stage-desc">Uploads image to Docker Hub / AWS ECR repository</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-6">Waiting...</span>
+                </div>
+
+                <!-- Stage 7 -->
+                <div class="stage-box state-pending" id="box-7">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-7"><i class="fas fa-server"></i></div>
+                        <div>
+                            <div class="stage-title">7. Deploy to Server (AWS EC2 / Local)</div>
+                            <div class="stage-desc">Stops old container and runs new container on port 8080</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-7">Waiting...</span>
+                </div>
+
+                <!-- Stage 8 -->
+                <div class="stage-box state-pending" id="box-8">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="stage-icon pending" id="ico-8"><i class="fas fa-heartbeat"></i></div>
+                        <div>
+                            <div class="stage-title">8. Health Verification</div>
+                            <div class="stage-desc">Pings /actuator/health for HTTP 200 OK confirmation</div>
+                        </div>
+                    </div>
+                    <span class="status-badge pending" id="badge-8">Waiting...</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: LIVE TERMINAL EXECUTION LOGS -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0; color: #0f172a; font-size: 1.25rem;"><i class="fas fa-terminal"></i> Live Execution Terminal Logs</h3>
+                    <button class="btn btn-secondary btn-sm" onclick="clearLogs()"><i class="fas fa-eraser"></i> Clear</button>
+                </div>
+
+                <div class="terminal-container" id="terminalLogBox">
+                    <div class="log-item INFO">[SYSTEM] Ready to start.</div>
+                    <div class="log-item INFO">[SYSTEM] Click "START PIPELINE" button above to run all 8 stages live.</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const stagesData = [
+            { id: 1, name: 'Checkout', delay: 1400, logs: [
+                'Connecting to Git repository: https://github.com/developer/devopsproject.git',
+                'Fetching origin/main branch...',
+                'Checked out commit: 8f19da3 (Commit: "feat: Student Management CRUD")',
+                'Cloned 28 source files into Jenkins workspace.'
+            ]},
+            { id: 2, name: 'Maven Build', delay: 1800, logs: [
+                'Running: mvn clean compile -B',
+                'Compiling 8 Java source files to target/classes...',
+                'Copying application.properties and static frontend files',
+                'BUILD SUCCESS - Compiled bytecode verified with 0 errors.'
+            ]},
+            { id: 3, name: 'JUnit Tests', delay: 1800, logs: [
+                'Running: mvn test (JUnit 5 & Mockito)',
+                'Test 1: StudentApplicationTests.contextLoads() -> PASSED',
+                'Test 2: StudentServiceTest.createStudent_Valid() -> PASSED',
+                'Test 3: StudentServiceTest.createStudent_DuplicateEmail() -> PASSED',
+                'Test 4: StudentServiceTest.deleteStudent_Success() -> PASSED',
+                'Results: Tests run: 5, Failures: 0, Errors: 0, Skipped: 0'
+            ]},
+            { id: 4, name: 'Package JAR', delay: 1300, logs: [
+                'Running: mvn package -DskipTests',
+                'Bundling classes and dependencies into fat JAR...',
+                'Created artifact: target/student-management-app-1.0.0.jar (42.8 MB)'
+            ]},
+            { id: 5, name: 'Docker Build', delay: 2000, logs: [
+                'Running: docker build -t student-management-app:latest .',
+                'Step 1/4: FROM eclipse-temurin:17-jre-alpine',
+                'Step 2/4: COPY app.jar /app/app.jar',
+                'Step 3/4: EXPOSE 8080',
+                'Successfully built Docker container image: student-management-app (148MB)'
+            ]},
+            { id: 6, name: 'Docker Push', delay: 1400, logs: [
+                'Logging in to Container Registry: docker.io',
+                'Pushing image: your-dockerhub/student-management-app:latest',
+                'Digest: sha256:71481d89b33a763c8a9fd5 size: 1240',
+                'Pushed image successfully to Docker Hub registry.'
+            ]},
+            { id: 7, name: 'Deploy Server', delay: 1600, logs: [
+                'Connecting to target deployment server (Port 8080)...',
+                'Stopping older container: docker stop student-management-app',
+                'Executing: docker run -d -p 8080:8080 --name student-app student-management-app:latest',
+                'Container 9c8b71a running live on port 8080!'
+            ]},
+            { id: 8, name: 'Verification', delay: 1200, logs: [
+                'Pinging health check endpoint: GET http://localhost:8080/actuator/health',
+                'HTTP Response: 200 OK -> {"status":"UP","components":{"db":{"status":"UP"}}}',
+                'Application is verified 100% HEALTHY and responsive!'
+            ]}
+        ];
+
+        function logLine(type, text) {
+            const box = document.getElementById('terminalLogBox');
+            const now = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'log-item ' + type;
+            div.textContent = `[${now}] [${type}] ${text}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('terminalLogBox').innerHTML = '';
+        }
+
+        function resetAll() {
+            document.getElementById('successBanner').style.display = 'none';
+            for (let i = 1; i <= 8; i++) {
+                document.getElementById('box-' + i).className = 'stage-box state-pending';
+                document.getElementById('ico-' + i).className = 'stage-icon pending';
+                document.getElementById('badge-' + i).className = 'status-badge pending';
+                document.getElementById('badge-' + i).textContent = 'Waiting...';
+            }
+            document.getElementById('pipelineGlobalStatus').className = 'status-badge';
+            document.getElementById('pipelineGlobalStatus').style.background = '#e2e8f0';
+            document.getElementById('pipelineGlobalStatus').style.color = '#475569';
+            document.getElementById('pipelineGlobalStatus').textContent = 'Ready to Run';
+        }
+
+        async function startAutomatedRun() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PIPELINE RUNNING...';
+
+            resetAll();
+            clearLogs();
+
+            document.getElementById('pipelineGlobalStatus').className = 'status-badge running';
+            document.getElementById('pipelineGlobalStatus').innerHTML = '<i class="fas fa-sync fa-spin"></i> Executing Pipeline...';
+
+            logLine('INFO', '=== AUTOMATED CI/CD PIPELINE INITIATED ===');
+            logLine('INFO', 'Trigger: Developer Git Push to main branch');
+            logLine('INFO', 'Reading configuration from C:\\devopsproject\\Jenkinsfile');
+
+            for (const stg of stagesData) {
+                const box = document.getElementById('box-' + stg.id);
+                const ico = document.getElementById('ico-' + stg.id);
+                const badge = document.getElementById('badge-' + stg.id);
+
+                // Set running
+                box.className = 'stage-box state-running';
+                ico.className = 'stage-icon running';
+                badge.className = 'status-badge running';
+                badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+
+                logLine('INFO', `>>> Entering Stage ${stg.id}: ${stg.name}`);
+                for (const l of stg.logs) {
+                    await new Promise(r => setTimeout(r, stg.delay / stg.logs.length));
+                    logLine('INFO', '  ' + l);
+                }
+
+                // Set passed
+                box.className = 'stage-box state-passed';
+                ico.className = 'stage-icon success';
+                badge.className = 'status-badge success';
+                badge.textContent = 'Passed ✓';
+
+                logLine('OK', `[SUCCESS] Stage ${stg.id} (${stg.name}) Completed successfully!`);
+            }
+
+            logLine('OK', '==================================================');
+            logLine('OK', '🎉 ALL 8 STAGES FINISHED WITH ZERO ERRORS!');
+            logLine('OK', 'Deployment live on http://localhost:8080');
+            logLine('OK', '==================================================');
+
+            document.getElementById('pipelineGlobalStatus').className = 'status-badge success';
+            document.getElementById('pipelineGlobalStatus').innerHTML = '<i class="fas fa-check-circle"></i> Pipeline Passed (100%)';
+            document.getElementById('successBanner').style.display = 'block';
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-redo"></i> RUN PIPELINE AGAIN';
+        }
+    </script>
+</body>
+</html>

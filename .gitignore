@@ -1,0 +1,29 @@
+# Compiled class files
+*.class
+*.jar
+*.war
+*.ear
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+# OS
+.DS_Store
+Thumbs.db
+# Environment
+.env
+*.env.local
+application-secret.properties
+# Logs
+*.log
+logs/
+# Node
+node_modules/
+

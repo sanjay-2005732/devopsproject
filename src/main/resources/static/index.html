@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System - Live Operations Inspector</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .banner-guide {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .activity-card {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-lg);
+            border-left: 5px solid #10b981;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 0.75rem;
+        }
+
+        .activity-header h3 {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-terminal {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            background: #020617;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #1e293b;
+        }
+
+        .activity-item {
+            margin-bottom: 4px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .act-time {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .act-tag {
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .act-tag.INSERT {
+            background: #065f46;
+            color: #34d399;
+        }
+
+        .act-tag.UPDATE {
+            background: #78350f;
+            color: #fbbf24;
+        }
+
+        .act-tag.DELETE {
+            background: #881337;
+            color: #fb7185;
+        }
+
+        .act-tag.SELECT {
+            background: #1e3a8a;
+            color: #60a5fa;
+        }
+
+        .act-tag.SYSTEM {
+            background: #374151;
+            color: #9ca3af;
+        }
+
+        .act-tag.SEARCH {
+            background: #4c1d95;
+            color: #c084fc;
+        }
+
+        .act-tag.VALIDATION {
+            background: #7f1d1d;
+            color: #f87171;
+        }
+
+        .act-msg {
+            color: #f1f5f9;
+            flex: 1;
+        }
+
+        .runtime-info {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .runtime-info span strong {
+            color: #38bdf8;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Student Management System</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="active"><i class="fas fa-user-graduate"></i> Student CRUD Page</a>
+            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> CI/CD Pipeline Dashboard</a>
+            <a href="Automated_CICD_Pipeline_DevOps_Project.pptx" download class="btn btn-warning btn-sm"
+                style="color: #fff; text-decoration: none;"><i class="fas fa-download"></i> Download PPT</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Explanatory Banner -->
+        <div class="banner-guide">
+            <div>
+                <strong style="color: #3730a3;"><i class="fas fa-info-circle"></i> Live Backend Operations
+                    Active</strong>
+                <p style="color: #4338ca; font-size: 0.88rem; margin: 4px 0 0 0;">
+                    Every time you <strong>Add</strong>, <strong>Edit</strong>, or <strong>Delete</strong> a student
+                    below, watch the <strong>Live Database Activity Console</strong> at the bottom of this page show the
+                    real SQL queries and HTTP status codes in real-time!
+                </p>
+            </div>
+            <a href="dashboard.html" class="btn btn-secondary btn-sm"
+                style="background:#fff; color:#4338ca; border-color:#c7d2fe;">
+                <i class="fas fa-tachometer-alt"></i> View Jenkins Pipeline
+            </a>
+        </div>
+
+        <!-- Header Section -->
+        <div class="hero">
+            <h1><i class="fas fa-user-graduate"></i> Student Management System</h1>
+            <p>Live Backend Process executing on Port 8080</p>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalStudents">0</span>
+                    <span class="stat-label">Students in DB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalDepartments">0</span>
+                    <span class="stat-label">Departments</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="appStatus">●</span>
+                    <span class="stat-label">Database Status</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Actions Bar -->
+        <div class="action-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search students by name..." onkeyup="searchStudents()">
+            </div>
+            <button class="btn btn-primary" onclick="openModal()">
+                <i class="fas fa-plus"></i> Add New Student Record
+            </button>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Students Table -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-database"></i> Student Records (In-Memory Database Table)</h2>
+                <button class="btn btn-secondary btn-sm" onclick="loadStudents()">
+                    <i class="fas fa-sync-alt"></i> Refresh Table
+                </button>
+            </div>
+            <div class="table-container">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr>
+                            <td colspan="7" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading students...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- NEW: Live Backend & Database Operations Inspector -->
+        <div class="activity-card">
+            <div class="activity-header">
+                <div>
+                    <h3><i class="fas fa-terminal"></i> Live Backend Operations & SQL Execution Log</h3>
+                    <div class="runtime-info" style="margin-top: 4px;">
+                        <span>Target: <strong>http://localhost:8080/api/students</strong></span>
+                        <span>Process PID: <strong id="procPid">Active</strong></span>
+                        <span>Backend State: <strong style="color: #34d399;">● RUNNING</strong></span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm"
+                    style="background:#1e293b; color:#94a3b8; border:1px solid #334155;" onclick="loadActivityLogs()">
+                    <i class="fas fa-sync-alt"></i> Refresh Logs
+                </button>
+            </div>
+            <div class="activity-terminal" id="activityTerminal">
+                <div class="activity-item">
+                    <span class="act-time">[Loading...]</span>
+                    <span class="act-tag SYSTEM">SYSTEM</span>
+                    <span class="act-msg">Connecting to live backend activity stream...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add/Edit Student -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-plus"></i> Add New Student</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="studentForm" onsubmit="handleSubmit(event)">
+                <input type="hidden" id="studentId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName"><i class="fas fa-user"></i> First Name *</label>
+                        <input type="text" id="firstName" required minlength="2" maxlength="50" placeholder="e.g. John">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName"><i class="fas fa-user"></i> Last Name *</label>
+                        <input type="text" id="lastName" required minlength="2" maxlength="50" placeholder="e.g. Smith">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email *</label>
+                    <input type="email" id="email" required placeholder="e.g. john.smith@email.com">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="department"><i class="fas fa-building"></i> Department</label>
+                        <select id="department">
+                            <option value="">Select Department</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Information Technology">Information Technology</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone"><i class="fas fa-phone"></i> Phone</label>
+                        <input type="tel" id="phone" maxlength="20" placeholder="e.g. 9876543210">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Save Student Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Student Management System | CI/CD Pipeline Project</p>
+        <p>Built with Spring Boot, Docker & Jenkins</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Poll for backend activity logs every 2 seconds
+        async function loadActivityLogs() {
+            try {
+                const res = await fetch('/api/activity');
+                const data = await res.json();
+                if (data.success && data.logs) {
+                    if (data.pid) document.getElementById('procPid').textContent = data.pid;
+                    const terminal = document.getElementById('activityTerminal');
+                    terminal.innerHTML = data.logs.map(log => `
+                        <div class="activity-item">
+                            <span class="act-time">[${log.timestamp}]</span>
+                            <span class="act-tag ${log.type}">${log.type}</span>
+                            <span class="act-msg">${escapeHtml(log.message)}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error("Activity poll error:", e);
+            }
+        }
+        setInterval(loadActivityLogs, 2000);
+        document.addEventListener('DOMContentLoaded', loadActivityLogs);
+    </script>
+</body>
+
+</html>
