@@ -427,12 +427,30 @@
 
             <!-- JENKINS VIEW -->
             <div id="view-jenkins" class="view-content">
-                <div style="background: #000; color: #fff; padding: 12px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fab fa-jenkins" style="font-size: 1.8rem; color: #ef4444;"></i>
-                        <span style="font-weight: 700; font-size: 1.1rem;">Jenkins Dashboard — student-management-pipeline</span>
+                <div style="background: #111827; color: #fff; padding: 14px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fab fa-jenkins" style="font-size: 2rem; color: #ef4444;"></i>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.15rem;">Jenkins Server Running Locally</div>
+                            <div style="font-size: 0.8rem; color: #94a3b8;">Port: 8081 | Connected to: sanjay-2005732/devopsproject</div>
+                        </div>
                     </div>
-                    <span class="status-badge success">Build #45 SUCCESS</span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="http://localhost:8081" target="_blank" style="background: #2563eb; color: #fff; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-external-link-alt"></i> Open Real Jenkins UI
+                        </a>
+                        <span class="status-badge success">RUNNING ON 8081</span>
+                    </div>
+                </div>
+
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 18px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: #1e40af;"><i class="fas fa-key"></i> Jenkins Initial Admin Password:</strong>
+                        <code style="background: #dbeafe; color: #1e3a8a; padding: 3px 8px; border-radius: 4px; font-weight: bold; margin-left: 8px; font-size: 0.95rem;">025d94217c554d7db6e60ed7de2a61a3</code>
+                    </div>
+                    <button onclick="navigator.clipboard.writeText('025d94217c554d7db6e60ed7de2a61a3'); alert('Admin password copied to clipboard!');" style="background: #1d4ed8; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;">
+                        <i class="fas fa-copy"></i> Copy Password
+                    </button>
                 </div>
                 <table class="stage-view-table">
                     <thead>
