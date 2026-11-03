@@ -38,3 +38,4 @@ jobs:
       run: |
         ls -la target/*.jar
         docker images | grep student-management-app
+

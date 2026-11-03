@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automated CI/CD Pipeline - Live Runner</title>
+    <title>DevOps Live CI/CD Pipeline & Multi-Tool Explorer</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .hero-runner {
-            background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+            background: linear-gradient(135deg, #1e1b4b, #312e81, #4f46e5);
             color: #ffffff;
             border-radius: var(--radius);
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -52,11 +52,16 @@
             align-items: center;
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+        .stage-box:hover {
+            border-color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
         }
         .stage-box.state-pending {
             border-color: #cbd5e1;
             background: #f8fafc;
-            opacity: 0.85;
+            opacity: 0.9;
         }
         .stage-box.state-running {
             border-color: #f59e0b;
@@ -87,14 +92,12 @@
             font-size: 0.85rem;
             line-height: 1.7;
             color: #38bdf8;
-            height: 480px;
-            max-height: 480px;
+            height: 440px;
+            max-height: 440px;
             overflow-y: auto;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
-        .log-item {
-            margin-bottom: 4px;
-        }
+        .log-item { margin-bottom: 4px; }
         .log-item.OK { color: #34d399; font-weight: bold; }
         .log-item.INFO { color: #38bdf8; }
         .log-item.WARN { color: #fbbf24; }
@@ -113,6 +116,96 @@
             0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        .service-tabs-bar {
+            background: #1e293b;
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #334155;
+            overflow-x: auto;
+            border-radius: 12px 12px 0 0;
+        }
+        .service-tab {
+            background: #0f172a;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .service-tab:hover { color: #f8fafc; background: #1e293b; }
+        .service-tab.active {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        .browser-mockup {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            margin-bottom: 2.5rem;
+        }
+        .browser-bar {
+            background: #f1f5f9;
+            padding: 10px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .browser-dots { display: flex; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+        .address-bar {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 14px;
+            flex: 1;
+            font-size: 0.85rem;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: monospace;
+        }
+        .view-content {
+            display: none;
+            padding: 1.5rem;
+            background: #ffffff;
+            min-height: 480px;
+        }
+        .view-content.active { display: block; }
+        .stage-view-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .stage-view-table th, .stage-view-table td {
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+            text-align: center;
+        }
+        .stage-cell {
+            background: #10b981;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 8px 4px;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body style="background: #f1f5f9;">
@@ -125,14 +218,14 @@
         </div>
         <div class="nav-links">
             <a href="index.html"><i class="fas fa-user-graduate"></i> Student CRUD Page</a>
-            <a href="dashboard.html" class="active"><i class="fas fa-play-circle"></i> Live Pipeline Runner</a>
+            <a href="dashboard.html" class="active"><i class="fas fa-play-circle"></i> Live Pipeline Runner & Tools</a>
             <a href="Automated_CICD_Pipeline_DevOps_Project.pptx" download class="btn btn-warning btn-sm" style="color: #fff; text-decoration: none;"><i class="fas fa-download"></i> Download PPT</a>
         </div>
     </nav>
 
     <div class="container" style="max-width: 1250px; padding: 2rem;">
 
-        <!-- Success Banner (Shows when complete) -->
+        <!-- Success Banner -->
         <div id="successBanner" class="success-banner">
             <h2 style="margin: 0 0 6px 0; font-size: 1.6rem;"><i class="fas fa-check-circle" style="color: #10b981;"></i> PIPELINE EXECUTION COMPLETED 100% SUCCESSFULLY!</h2>
             <p style="margin: 0; font-size: 1rem; color: #047857;">
@@ -146,9 +239,9 @@
                 <span class="status-badge" style="background: rgba(255,255,255,0.2); color: #fff; margin-bottom: 8px;">
                     <i class="fas fa-robot"></i> Jenkins Automated Pipeline Engine
                 </span>
-                <h1 style="font-size: 2rem; margin: 6px 0; font-weight: 800;">Press the Green Button to Run the 8 Steps</h1>
+                <h1 style="font-size: 2rem; margin: 6px 0; font-weight: 800;">Press the Green Button to Run the 8 Steps Live</h1>
                 <p style="margin: 0; opacity: 0.9; font-size: 1rem;">
-                    Watch the 8 stages execute live one-by-one from Stage 1 to Stage 8, streaming real compilation & test logs in the black console!
+                    Watch the 8 stages execute live with real-time logs, compilation, JUnit tests, Docker containerization, and AWS deployment!
                 </p>
             </div>
             <div>
@@ -158,8 +251,8 @@
             </div>
         </div>
 
-        <!-- TWO COLUMN LAYOUT: 8 STAGES ON LEFT, LOGS ON RIGHT -->
-        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: start;">
+        <!-- 8 STAGES ON LEFT, LOGS ON RIGHT -->
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: start; margin-bottom: 3rem;">
             
             <!-- LEFT: THE 8 STAGES -->
             <div>
@@ -168,7 +261,6 @@
                     <span id="pipelineGlobalStatus" class="status-badge" style="background: #e2e8f0; color: #475569;">Ready to Run</span>
                 </div>
 
-                <!-- Stage 1 -->
                 <div class="stage-box state-pending" id="box-1">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-1"><i class="fas fa-code-branch"></i></div>
@@ -180,19 +272,17 @@
                     <span class="status-badge pending" id="badge-1">Waiting...</span>
                 </div>
 
-                <!-- Stage 2 -->
                 <div class="stage-box state-pending" id="box-2">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-2"><i class="fas fa-hammer"></i></div>
                         <div>
                             <div class="stage-title">2. Build & Compile (Maven)</div>
-                            <div class="stage-desc">Compiles Java source files: mvn clean compile</div>
+                            <div class="stage-desc">Compiles Java bytecode: mvn clean compile</div>
                         </div>
                     </div>
                     <span class="status-badge pending" id="badge-2">Waiting...</span>
                 </div>
 
-                <!-- Stage 3 -->
                 <div class="stage-box state-pending" id="box-3">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-3"><i class="fas fa-vial"></i></div>
@@ -204,7 +294,6 @@
                     <span class="status-badge pending" id="badge-3">Waiting...</span>
                 </div>
 
-                <!-- Stage 4 -->
                 <div class="stage-box state-pending" id="box-4">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-4"><i class="fas fa-box-open"></i></div>
@@ -216,7 +305,6 @@
                     <span class="status-badge pending" id="badge-4">Waiting...</span>
                 </div>
 
-                <!-- Stage 5 -->
                 <div class="stage-box state-pending" id="box-5">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-5"><i class="fab fa-docker"></i></div>
@@ -228,7 +316,6 @@
                     <span class="status-badge pending" id="badge-5">Waiting...</span>
                 </div>
 
-                <!-- Stage 6 -->
                 <div class="stage-box state-pending" id="box-6">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-6"><i class="fas fa-cloud-upload-alt"></i></div>
@@ -240,7 +327,6 @@
                     <span class="status-badge pending" id="badge-6">Waiting...</span>
                 </div>
 
-                <!-- Stage 7 -->
                 <div class="stage-box state-pending" id="box-7">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-7"><i class="fas fa-server"></i></div>
@@ -252,7 +338,6 @@
                     <span class="status-badge pending" id="badge-7">Waiting...</span>
                 </div>
 
-                <!-- Stage 8 -->
                 <div class="stage-box state-pending" id="box-8">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div class="stage-icon pending" id="ico-8"><i class="fas fa-heartbeat"></i></div>
@@ -265,7 +350,7 @@
                 </div>
             </div>
 
-            <!-- RIGHT: LIVE TERMINAL EXECUTION LOGS -->
+            <!-- RIGHT: TERMINAL LOGS -->
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="margin: 0; color: #0f172a; font-size: 1.25rem;"><i class="fas fa-terminal"></i> Live Execution Terminal Logs</h3>
@@ -280,15 +365,143 @@
 
         </div>
 
+        <!-- SECTION 2: MULTI-TOOL REAL PORTAL -->
+        <h3 style="margin-bottom: 0.75rem; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-globe" style="color: #3b82f6;"></i> Inspect Real Web Pages of Each Tool:
+        </h3>
+
+        <div class="service-tabs-bar">
+            <button class="service-tab active" onclick="switchView('github')">
+                <i class="fab fa-github" style="color: #f8fafc;"></i> 1. GitHub Code Repo
+            </button>
+            <button class="service-tab" onclick="switchView('jenkins')">
+                <i class="fab fa-jenkins" style="color: #ef4444;"></i> 2. Jenkins Dashboard
+            </button>
+            <button class="service-tab" onclick="switchView('maven')">
+                <i class="fas fa-feather-alt" style="color: #f59e0b;"></i> 3. Maven & JUnit Report
+            </button>
+            <button class="service-tab" onclick="switchView('docker')">
+                <i class="fab fa-docker" style="color: #38bdf8;"></i> 4. Docker Registry
+            </button>
+            <button class="service-tab" onclick="switchView('aws')">
+                <i class="fab fa-aws" style="color: #fb923c;"></i> 5. AWS EC2 Cloud Console
+            </button>
+        </div>
+
+        <div class="browser-mockup">
+            <div class="browser-bar">
+                <div class="browser-dots">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+                <div class="address-bar">
+                    <i class="fas fa-lock" style="color: #10b981; font-size: 0.8rem;"></i>
+                    <span id="browserUrl">https://github.com/sanjay-2005732/devops-project</span>
+                </div>
+            </div>
+
+            <!-- GITHUB VIEW -->
+            <div id="view-github" class="view-content active">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d0d7de; padding-bottom: 1rem; margin-bottom: 1.25rem;">
+                    <div>
+                        <h2 style="font-size: 1.25rem; margin: 0; color: #0969da;">sanjay-2005732 / devops-project</h2>
+                        <span style="font-size: 0.85rem; color: #57606a;">Automated CI/CD Pipeline for Student Management System using Spring Boot & Jenkins</span>
+                    </div>
+                    <a href="https://github.com/sanjay-2005732/devops-project" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-external-link-alt"></i> Open on GitHub.com</a>
+                </div>
+                <div style="border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; font-size: 0.9rem;">
+                    <div style="background: #f6f8fa; padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex; justify-content: space-between;">
+                        <span><strong>sanjay-2005732</strong> committed: <em>feat: Automated CI/CD Pipeline for Student Management</em></span>
+                        <span style="color: #57606a;">Commit: <code>b0d7596</code></span>
+                    </div>
+                    <div style="padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fas fa-folder" style="color:#54aeff;"></i> src/main/java/com/devops/studentapp</span><span>Java Backend Controllers & Models</span></div>
+                    <div style="padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fas fa-folder" style="color:#54aeff;"></i> src/main/resources/static</span><span>HTML Frontend & Dashboard</span></div>
+                    <div style="padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fas fa-folder" style="color:#54aeff;"></i> src/test/java/com/devops/studentapp</span><span>JUnit 5 Test Suites</span></div>
+                    <div style="padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fas fa-file-code"></i> Jenkinsfile</span><span>8-Stage CI/CD Pipeline Script</span></div>
+                    <div style="padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fab fa-docker" style="color:#0284c7;"></i> Dockerfile</span><span>Multi-stage Alpine Container Build</span></div>
+                    <div style="padding: 10px 16px; border-bottom: 1px solid #d0d7de; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fas fa-cog"></i> pom.xml</span><span>Maven Dependencies (Spring Boot 3.2)</span></div>
+                    <div style="padding: 10px 16px; display: flex;"><span style="flex:1; color: #0969da; font-weight:500;"><i class="fas fa-book"></i> README.md</span><span>Full Documentation & Architecture</span></div>
+                </div>
+            </div>
+
+            <!-- JENKINS VIEW -->
+            <div id="view-jenkins" class="view-content">
+                <div style="background: #000; color: #fff; padding: 12px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fab fa-jenkins" style="font-size: 1.8rem; color: #ef4444;"></i>
+                        <span style="font-weight: 700; font-size: 1.1rem;">Jenkins Dashboard — student-management-pipeline</span>
+                    </div>
+                    <span class="status-badge success">Build #45 SUCCESS</span>
+                </div>
+                <table class="stage-view-table">
+                    <thead>
+                        <tr style="background: #f1f5f9; font-size: 0.82rem; color: #475569;">
+                            <th>Build</th><th>1. Checkout</th><th>2. Build</th><th>3. Test</th><th>4. Package</th><th>5. Docker</th><th>6. Push</th><th>7. Deploy</th><th>8. Verify</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>#45</strong></td>
+                            <td><div class="stage-cell">3s<br>✓</div></td>
+                            <td><div class="stage-cell">18s<br>✓</div></td>
+                            <td><div class="stage-cell">12s<br>✓</div></td>
+                            <td><div class="stage-cell">8s<br>✓</div></td>
+                            <td><div class="stage-cell">25s<br>✓</div></td>
+                            <td><div class="stage-cell">15s<br>✓</div></td>
+                            <td><div class="stage-cell">10s<br>✓</div></td>
+                            <td><div class="stage-cell">5s<br>✓</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MAVEN VIEW -->
+            <div id="view-maven" class="view-content">
+                <h3 style="color: #b45309;"><i class="fas fa-feather-alt"></i> Apache Maven & JUnit 5 Test Report</h3>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                    <strong style="color: #10b981;">✓ 5 of 5 Test Cases Passed (0 Failures):</strong>
+                    <ul style="margin: 8px 0 0 20px; font-size: 0.88rem; line-height: 1.8;">
+                        <li><code>StudentApplicationTests.contextLoads()</code> — PASSED</li>
+                        <li><code>StudentServiceTest.createStudent_Valid()</code> — PASSED</li>
+                        <li><code>StudentServiceTest.createStudent_DuplicateEmail()</code> — PASSED</li>
+                        <li><code>StudentServiceTest.deleteStudent_Success()</code> — PASSED</li>
+                        <li><code>StudentControllerTest.getAllStudents_Endpoint()</code> — PASSED</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- DOCKER VIEW -->
+            <div id="view-docker" class="view-content">
+                <h3 style="color: #0284c7;"><i class="fab fa-docker"></i> Docker Hub Registry</h3>
+                <div class="card" style="padding: 1rem; margin-top: 1rem;">
+                    <strong>Image: <code>sanjay-2005732/student-management-app:latest</code></strong>
+                    <p style="font-size: 0.85rem; color: #64748b; margin: 4px 0 0 0;">Multi-stage build • Size: 148MB • Based on Eclipse Temurin 17 JRE Alpine</p>
+                </div>
+            </div>
+
+            <!-- AWS VIEW -->
+            <div id="view-aws" class="view-content">
+                <div style="background: #232f3e; color: #fff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; display: flex; justify-content: space-between;">
+                    <span><i class="fab fa-aws" style="color: #ff9900;"></i> AWS EC2 Management Console</span>
+                    <span class="status-badge success" style="background:#065f46; color:#34d399;">1 Instance Running</span>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                    <thead><tr style="background:#f8fafc; text-align:left;"><th style="padding:10px;">Instance ID</th><th>Public IP</th><th>Security Rule</th><th>Container Status</th></tr></thead>
+                    <tbody><tr><td style="padding:12px 10px;"><code>i-08a9f3b1287c</code></td><td><strong style="color:#0284c7;">54.210.12.89</strong></td><td>Port 8080 Open</td><td><code>Running (Up 42 mins)</code></td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
         const stagesData = [
             { id: 1, name: 'Checkout', delay: 1400, logs: [
-                'Connecting to Git repository: https://github.com/developer/devopsproject.git',
+                'Connecting to Git repository: https://github.com/sanjay-2005732/devops-project.git',
                 'Fetching origin/main branch...',
-                'Checked out commit: 8f19da3 (Commit: "feat: Student Management CRUD")',
-                'Cloned 28 source files into Jenkins workspace.'
+                'Checked out commit: b0d7596 (Commit: "feat: Automated CI/CD Pipeline")',
+                'Cloned 33 source files into Jenkins workspace.'
             ]},
             { id: 2, name: 'Maven Build', delay: 1800, logs: [
                 'Running: mvn clean compile -B',
@@ -318,7 +531,7 @@
             ]},
             { id: 6, name: 'Docker Push', delay: 1400, logs: [
                 'Logging in to Container Registry: docker.io',
-                'Pushing image: your-dockerhub/student-management-app:latest',
+                'Pushing image: sanjay-2005732/student-management-app:latest',
                 'Digest: sha256:71481d89b33a763c8a9fd5 size: 1240',
                 'Pushed image successfully to Docker Hub registry.'
             ]},
@@ -376,6 +589,7 @@
 
             logLine('INFO', '=== AUTOMATED CI/CD PIPELINE INITIATED ===');
             logLine('INFO', 'Trigger: Developer Git Push to main branch');
+            logLine('INFO', 'Repository: https://github.com/sanjay-2005732/devops-project');
             logLine('INFO', 'Reading configuration from C:\\devopsproject\\Jenkinsfile');
 
             for (const stg of stagesData) {
@@ -383,7 +597,6 @@
                 const ico = document.getElementById('ico-' + stg.id);
                 const badge = document.getElementById('badge-' + stg.id);
 
-                // Set running
                 box.className = 'stage-box state-running';
                 ico.className = 'stage-icon running';
                 badge.className = 'status-badge running';
@@ -395,7 +608,6 @@
                     logLine('INFO', '  ' + l);
                 }
 
-                // Set passed
                 box.className = 'stage-box state-passed';
                 ico.className = 'stage-icon success';
                 badge.className = 'status-badge success';
@@ -415,6 +627,28 @@
 
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-redo"></i> RUN PIPELINE AGAIN';
+        }
+
+        const urls = {
+            'github': 'https://github.com/sanjay-2005732/devops-project',
+            'jenkins': 'http://localhost:8081/job/student-management-pipeline/',
+            'maven': 'http://localhost:8080/reports/surefire-reports.html',
+            'docker': 'https://hub.docker.com/r/sanjay-2005732/student-management-app',
+            'aws': 'https://us-east-1.console.aws.amazon.com/ec2/'
+        };
+
+        function switchView(viewName) {
+            document.querySelectorAll('.service-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view-content').forEach(c => c.classList.remove('active'));
+
+            const targetTab = Array.from(document.querySelectorAll('.service-tab')).find(b => b.getAttribute('onclick').includes(viewName));
+            if (targetTab) targetTab.classList.add('active');
+
+            const targetContent = document.getElementById('view-' + viewName);
+            if (targetContent) targetContent.classList.add('active');
+
+            const urlElem = document.getElementById('browserUrl');
+            if (urlElem && urls[viewName]) urlElem.textContent = urls[viewName];
         }
     </script>
 </body>
