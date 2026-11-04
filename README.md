@@ -1,11 +1,13 @@
 # 🚀 Automated CI/CD Pipeline
 ## Student Management Application
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](/)
+[![Build Status](https://img.shields.io/badge/Jenkins%20CI-Passing-brightgreen)](http://localhost:8081/job/student-pipeline/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Passing-brightgreen)](https://github.com/sanjay-2005732/devopsproject/actions)
 [![Java](https://img.shields.io/badge/Java-17-orange)](/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)](/)
+[![Maven](https://img.shields.io/badge/Maven-3.9.6-red)](/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue)](/)
-[![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline-red)](/)
+[![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline-red)](http://localhost:8081)
 [![License](https://img.shields.io/badge/license-MIT-blue)](/)
 
 A complete **Student Management Web Application** with an **Automated CI/CD Pipeline** using **Jenkins, GitHub, Maven, Docker, and AWS**.
