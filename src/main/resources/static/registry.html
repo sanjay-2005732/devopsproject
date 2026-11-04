@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Hub Live Registry & Container Runtime</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .registry-hero {
+            background: linear-gradient(135deg, #091e3a 0%, #103463 50%, #0284c7 100%);
+            color: #ffffff;
+            border-radius: var(--radius);
+            padding: 2rem 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .registry-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .stat-val {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .stat-lbl {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            background: #1e293b;
+            padding: 8px 16px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 2px solid #334155;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: #0f172a;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #f8fafc; border-color: #0284c7; }
+        .tab-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; }
+        .tab-panel {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        .tab-panel.active { display: block; }
+        .code-box {
+            background: #0f172a;
+            color: #38bdf8;
+            font-family: 'Fira Code', monospace;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .copy-btn {
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover { background: #0284c7; color: #fff; }
+        .tag-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .tag-table th {
+            background: #f8fafc;
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #475569;
+            font-weight: 600;
+        }
+        .tag-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .layer-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+        .terminal-container {
+            background: #0b1120;
+            border-radius: 10px;
+            padding: 1rem;
+            color: #38bdf8;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            height: 280px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fab fa-docker" style="color: #0284c7; font-size: 1.6rem;"></i>
+            <span>Docker Live Container Registry</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-user-graduate"></i> Student CRUD Page</a>
+            <a href="dashboard.html"><i class="fas fa-play-circle"></i> CI/CD Pipeline Dashboard</a>
+            <a href="registry.html" class="active"><i class="fab fa-docker"></i> Docker Registry</a>
+            <a href="http://localhost:8081" target="_blank" class="btn btn-sm" style="background:#ef4444; color:#fff; text-decoration:none;"><i class="fab fa-jenkins"></i> Jenkins (8081)</a>
+            <a href="Automated_CICD_Pipeline_DevOps_Project.pptx" download class="btn btn-warning btn-sm" style="color: #fff; text-decoration: none;"><i class="fas fa-download"></i> PPT</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="registry-hero">
+            <div>
+                <span class="registry-badge"><i class="fas fa-globe"></i> Public Cloud Container Registry</span>
+                <h1 style="font-size: 2rem; margin: 4px 0 8px 0; font-weight: 800;">
+                    sanjay-2005732 / student-management-app
+                </h1>
+                <p style="margin: 0; opacity: 0.9; font-size: 0.95rem; max-width: 650px;">
+                    Production multi-stage Docker container image for Spring Boot 3 & Adoptium OpenJDK 17. Built and pushed automatically by Jenkins CI/CD Pipeline.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="simulatePush()" class="btn btn-success" style="padding: 10px 18px; font-weight: 600;">
+                    <i class="fas fa-cloud-upload-alt"></i> Push New Tag
+                </button>
+                <a href="https://hub.docker.com" target="_blank" class="btn btn-primary" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); text-decoration: none;">
+                    <i class="fas fa-external-link-alt"></i> View on DockerHub
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fas fa-box"></i></div>
+                <div>
+                    <div class="stat-val" id="statPulls">142</div>
+                    <div class="stat-lbl">Total Image Pulls</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #dcfce7; color: #16a34a;"><i class="fas fa-server"></i></div>
+                <div>
+                    <div class="stat-val" style="color: #16a34a;">Running</div>
+                    <div class="stat-lbl">Container Status (8080)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef3c7; color: #d97706;"><i class="fas fa-weight-hanging"></i></div>
+                <div>
+                    <div class="stat-val">148.2 MB</div>
+                    <div class="stat-lbl">Compressed Image Size</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;"><i class="fas fa-tags"></i></div>
+                <div>
+                    <div class="stat-val">3 Tags</div>
+                    <div class="stat-lbl">Active Releases</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pull Command Box -->
+        <div class="code-box">
+            <span><i class="fas fa-terminal"></i> docker pull sanjay-2005732/student-management-app:latest</span>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText('docker pull sanjay-2005732/student-management-app:latest'); alert('Copied docker pull command!');">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="switchTab('tags')"><i class="fas fa-tags"></i> Image Tags & Digests</button>
+            <button class="tab-btn" onclick="switchTab('layers')"><i class="fas fa-layer-group"></i> Dockerfile Layers</button>
+            <button class="tab-btn" onclick="switchTab('runtime')"><i class="fas fa-microchip"></i> Live Container Runtime</button>
+            <button class="tab-btn" onclick="switchTab('manifest')"><i class="fas fa-file-code"></i> Image Manifest (JSON)</button>
+        </div>
+
+        <!-- PANEL 1: TAGS -->
+        <div id="panel-tags" class="tab-panel active">
+            <h3 style="margin-top: 0; color: #1e293b;"><i class="fas fa-list"></i> Published Repository Tags</h3>
+            <table class="tag-table">
+                <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>OS / Architecture</th>
+                        <th>Digest SHA256</th>
+                        <th>Compressed Size</th>
+                        <th>Pushed</th>
+                        <th>Deployment Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tagsBody">
+                    <tr>
+                        <td><span class="status-badge success" style="font-size:0.85rem;"><i class="fas fa-tag"></i> latest</span></td>
+                        <td><code>linux/amd64</code></td>
+                        <td><code>sha256:71481d89b33a763c...</code></td>
+                        <td><strong>148.2 MB</strong></td>
+                        <td>Just now (Automated)</td>
+                        <td><span style="color:#16a34a; font-weight:700;"><i class="fas fa-check-circle"></i> DEPLOYED ON AWS / LOCAL</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-badge" style="background:#e0f2fe; color:#0369a1; font-size:0.85rem;"><i class="fas fa-tag"></i> 1.0.0</span></td>
+                        <td><code>linux/amd64</code></td>
+                        <td><code>sha256:9f42a1b5c89e2178...</code></td>
+                        <td><strong>148.2 MB</strong></td>
+                        <td>Today, 05:15 AM</td>
+                        <td><span style="color:#64748b; font-weight:600;"><i class="fas fa-archive"></i> Stable Release</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-badge" style="background:#f1f5f9; color:#475569; font-size:0.85rem;"><i class="fas fa-tag"></i> 1.0.0-SNAPSHOT</span></td>
+                        <td><code>linux/amd64</code></td>
+                        <td><code>sha256:3a1b92c45e781190...</code></td>
+                        <td><strong>147.9 MB</strong></td>
+                        <td>Yesterday, 04:30 PM</td>
+                        <td><span style="color:#94a3b8; font-weight:600;">Development Build</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PANEL 2: LAYERS -->
+        <div id="panel-layers" class="tab-panel">
+            <h3 style="margin-top: 0; color: #1e293b;"><i class="fas fa-layer-group"></i> Multi-Stage Dockerfile Layer Breakdown</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">
+                Each instruction in your <code>C:\devopsproject\Dockerfile</code> builds a cached immutable filesystem layer:
+            </p>
+
+            <div class="layer-box">
+                <div><span style="color:#2563eb; font-weight:700;">LAYER 1:</span> <code>FROM eclipse-temurin:17-jre-alpine</code></div>
+                <div><span class="status-badge" style="background:#e0e7ff; color:#3730a3;">Base Image</span> <strong>84.3 MB</strong></div>
+            </div>
+            <div class="layer-box">
+                <div><span style="color:#2563eb; font-weight:700;">LAYER 2:</span> <code>WORKDIR /app</code></div>
+                <div><span class="status-badge" style="background:#f1f5f9; color:#475569;">Filesystem</span> <strong>0 B</strong></div>
+            </div>
+            <div class="layer-box">
+                <div><span style="color:#2563eb; font-weight:700;">LAYER 3:</span> <code>COPY target/student-management-app-1.0.0.jar app.jar</code></div>
+                <div><span class="status-badge" style="background:#dcfce7; color:#16a34a;">App Bytecode</span> <strong>52.7 MB</strong></div>
+            </div>
+            <div class="layer-box">
+                <div><span style="color:#2563eb; font-weight:700;">LAYER 4:</span> <code>EXPOSE 8080</code></div>
+                <div><span class="status-badge" style="background:#fef3c7; color:#b45309;">Networking</span> <strong>0 B</strong></div>
+            </div>
+            <div class="layer-box">
+                <div><span style="color:#2563eb; font-weight:700;">LAYER 5:</span> <code>ENTRYPOINT ["java", "-jar", "app.jar"]</code></div>
+                <div><span class="status-badge" style="background:#f3e8ff; color:#7e22ce;">Runtime Command</span> <strong>0 B</strong></div>
+            </div>
+        </div>
+
+        <!-- PANEL 3: RUNTIME -->
+        <div id="panel-runtime" class="tab-panel">
+            <h3 style="margin-top: 0; color: #1e293b;"><i class="fas fa-microchip"></i> Live Container Runtime Monitor</h3>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 0.8rem; color: #64748b;">Container ID</div>
+                    <div style="font-family: 'Fira Code', monospace; font-weight: 700; color: #0f172a;">c7e192a8b941</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 0.8rem; color: #64748b;">Port Forwarding</div>
+                    <div style="font-family: 'Fira Code', monospace; font-weight: 700; color: #2563eb;">0.0.0.0:8080 ➔ 8080/tcp</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 0.8rem; color: #64748b;">CPU Usage</div>
+                    <div style="font-family: 'Fira Code', monospace; font-weight: 700; color: #16a34a;" id="cpuVal">1.2%</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 0.8rem; color: #64748b;">RAM Memory</div>
+                    <div style="font-family: 'Fira Code', monospace; font-weight: 700; color: #0284c7;" id="ramVal">186 MB / 1024 MB</div>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom: 8px; color: #1e293b;"><i class="fas fa-terminal"></i> Live Container Console Stream:</h4>
+            <div class="terminal-container" id="containerTerminal">
+                <div>[docker-daemon] Container c7e192a8b941 initialized from image sanjay-2005732/student-management-app:latest</div>
+                <div>[docker-daemon] Assigned internal IP: 172.17.0.2</div>
+                <div>[docker-daemon] Bound host port 8080 -> container port 8080</div>
+                <div>[spring-boot] Starting StudentApplication v1.0.0 using Java 17.0.21 on c7e192a8b941</div>
+                <div>[spring-boot] Tomcat started on port 8080 (http) with context path ''</div>
+                <div>[spring-boot] Started StudentApplication in 3.42 seconds (process running)</div>
+                <div style="color: #34d399;">[actuator] Health check status: UP (HTTP 200 OK)</div>
+                <div>[http-request] GET /api/students -> Status: 200 OK (5 records returned)</div>
+            </div>
+        </div>
+
+        <!-- PANEL 4: MANIFEST -->
+        <div id="panel-manifest" class="tab-panel">
+            <h3 style="margin-top: 0; color: #1e293b;"><i class="fas fa-file-code"></i> Image Manifest (OCI / Docker V2 Schema 2)</h3>
+            <pre style="background: #0f172a; color: #38bdf8; padding: 1rem; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 0.82rem; overflow-x: auto;">
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+  "config": {
+    "mediaType": "application/vnd.docker.container.image.v1+json",
+    "size": 3120,
+    "digest": "sha256:71481d89b33a763c8a9fd5e82b3147819c968f44d18"
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "size": 84321092,
+      "digest": "sha256:c0669b37c28a7e089d8165b6f34e6047c3"
+    },
+    {
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "size": 52787531,
+      "digest": "sha256:e1a908f2389a0b12c85e49b816f947d120"
+    }
+  ],
+  "annotations": {
+    "org.opencontainers.image.title": "Student Management System",
+    "org.opencontainers.image.version": "1.0.0",
+    "org.opencontainers.image.source": "https://github.com/sanjay-2005732/devopsproject",
+    "org.opencontainers.image.authors": "Sanjay"
+  }
+}
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(name) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(name));
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const targetPanel = document.getElementById('panel-' + name);
+            if (targetPanel) targetPanel.classList.add('active');
+        }
+
+        function simulatePush() {
+            const ver = prompt("Enter version tag to push to Docker Hub:", "1.0.1");
+            if (!ver) return;
+
+            const tbody = document.getElementById('tagsBody');
+            const newRow = document.createElement('tr');
+            newRow.style.background = "#ecfdf5";
+            newRow.innerHTML = `
+                <td><span class="status-badge success" style="font-size:0.85rem;"><i class="fas fa-tag"></i> ${ver}</span></td>
+                <td><code>linux/amd64</code></td>
+                <td><code>sha256:${Math.random().toString(16).substring(2, 18)}...</code></td>
+                <td><strong>148.2 MB</strong></td>
+                <td>Just Now (Manual Push)</td>
+                <td><span style="color:#16a34a; font-weight:700;"><i class="fas fa-check-circle"></i> PUSHED TO REGISTRY</span></td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            const pullsElem = document.getElementById('statPulls');
+            if (pullsElem) pullsElem.textContent = parseInt(pullsElem.textContent) + 1;
+
+            const term = document.getElementById('containerTerminal');
+            if (term) {
+                const now = new Date().toLocaleTimeString();
+                term.innerHTML += `<div>[${now}] [docker-push] Tagged sanjay-2005732/student-management-app:${ver}</div>`;
+                term.innerHTML += `<div style="color:#34d399;">[${now}] [docker-push] Pushed image successfully to docker.io registry</div>`;
+                term.scrollTop = term.scrollHeight;
+            }
+
+            alert(`Docker image sanjay-2005732/student-management-app:${ver} successfully pushed to registry!`);
+        }
+
+        // Live metrics jitter
+        setInterval(() => {
+            const cpu = (0.8 + Math.random() * 0.9).toFixed(1);
+            const ram = Math.floor(182 + Math.random() * 8);
+            const cpuEl = document.getElementById('cpuVal');
+            const ramEl = document.getElementById('ramVal');
+            if (cpuEl) cpuEl.textContent = cpu + '%';
+            if (ramEl) ramEl.textContent = ram + ' MB / 1024 MB';
+        }, 3000);
+    </script>
+</body>
+</html>

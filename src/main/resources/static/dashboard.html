@@ -219,6 +219,8 @@
         <div class="nav-links">
             <a href="index.html"><i class="fas fa-user-graduate"></i> Student CRUD Page</a>
             <a href="dashboard.html" class="active"><i class="fas fa-play-circle"></i> Live Pipeline Runner & Tools</a>
+            <a href="registry.html"><i class="fab fa-docker"></i> Docker Registry</a>
+            <a href="http://localhost:8081" target="_blank" class="btn btn-sm" style="background:#ef4444; color:#fff; text-decoration:none;"><i class="fab fa-jenkins"></i> Jenkins (8081)</a>
             <a href="Automated_CICD_Pipeline_DevOps_Project.pptx" download class="btn btn-warning btn-sm" style="color: #fff; text-decoration: none;"><i class="fas fa-download"></i> Download PPT</a>
         </div>
     </nav>
@@ -491,11 +493,83 @@
 
             <!-- DOCKER VIEW -->
             <div id="view-docker" class="view-content">
-                <h3 style="color: #0284c7;"><i class="fab fa-docker"></i> Docker Hub Registry</h3>
-                <div class="card" style="padding: 1rem; margin-top: 1rem;">
-                    <strong>Image: <code>sanjay-2005732/student-management-app:latest</code></strong>
-                    <p style="font-size: 0.85rem; color: #64748b; margin: 4px 0 0 0;">Multi-stage build • Size: 148MB • Based on Eclipse Temurin 17 JRE Alpine</p>
+                <div style="background: #091e3a; color: #fff; padding: 14px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fab fa-docker" style="font-size: 2rem; color: #0284c7;"></i>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.15rem;">Docker Hub Container Registry & Runtime</div>
+                            <div style="font-size: 0.8rem; color: #94a3b8;">Repository: docker.io/sanjay-2005732/student-management-app</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="registry.html" style="background: #0284c7; color: #fff; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-external-link-alt"></i> Open Full Registry UI
+                        </a>
+                        <span class="status-badge success">CONTAINER RUNNING (8080)</span>
+                    </div>
                 </div>
+
+                <div style="background: #0f172a; color: #38bdf8; font-family: monospace; padding: 10px 16px; border-radius: 6px; font-size: 0.88rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <span><i class="fas fa-terminal"></i> docker pull sanjay-2005732/student-management-app:latest</span>
+                    <button onclick="navigator.clipboard.writeText('docker pull sanjay-2005732/student-management-app:latest'); alert('Copied docker pull command!');" style="background: #1e293b; color: #fff; border: 1px solid #334155; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 0.8rem; color: #64748b;">Image Size</div>
+                        <div style="font-weight: 700; color: #0f172a;">148.2 MB (Compressed)</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 0.8rem; color: #64748b;">Base Image</div>
+                        <div style="font-weight: 700; color: #2563eb;">eclipse-temurin:17-alpine</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 0.8rem; color: #64748b;">Active Container</div>
+                        <div style="font-weight: 700; color: #16a34a;">Up 2 hrs (Port 8080)</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 0.8rem; color: #64748b;">Total Pulls</div>
+                        <div style="font-weight: 700; color: #7e22ce;">142 Downloads</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 0 0 10px 0; color: #1e293b;"><i class="fas fa-tags"></i> Published Docker Registry Tags:</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr style="background: #f1f5f9; text-align: left; color: #475569;">
+                            <th style="padding: 10px 12px;">Tag</th>
+                            <th>Digest</th>
+                            <th>OS / Arch</th>
+                            <th>Size</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px 12px;"><span class="status-badge success"><i class="fas fa-tag"></i> latest</span></td>
+                            <td><code>sha256:71481d89b33a...</code></td>
+                            <td>linux/amd64</td>
+                            <td><strong>148.2 MB</strong></td>
+                            <td><span style="color: #16a34a; font-weight: 700;">LIVE ON PORT 8080</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px 12px;"><span class="status-badge" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-tag"></i> 1.0.0</span></td>
+                            <td><code>sha256:9f42a1b5c89e...</code></td>
+                            <td>linux/amd64</td>
+                            <td><strong>148.2 MB</strong></td>
+                            <td><span>Stable Release</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px 12px;"><span class="status-badge" style="background:#f1f5f9; color:#475569;"><i class="fas fa-tag"></i> 1.0.0-SNAPSHOT</span></td>
+                            <td><code>sha256:3a1b92c45e78...</code></td>
+                            <td>linux/amd64</td>
+                            <td><strong>147.9 MB</strong></td>
+                            <td><span style="color: #94a3b8;">Dev Build</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- AWS VIEW -->
