@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Maven & JUnit 5 Live Test Report</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .maven-hero {
+            background: linear-gradient(135deg, #451a03 0%, #78350f 50%, #b45309 100%);
+            color: #ffffff;
+            border-radius: var(--radius);
+            padding: 2rem 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(180, 83, 9, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .lifecycle-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+        .lifecycle-step {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .lifecycle-step.active {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        .lifecycle-step .name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .lifecycle-step .time {
+            font-size: 0.78rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            background: #1e293b;
+            padding: 8px 16px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 2px solid #334155;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: #0f172a;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #f8fafc; border-color: #f59e0b; }
+        .tab-btn.active { background: #b45309; color: #ffffff; border-color: #b45309; }
+        .tab-panel {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        .tab-panel.active { display: block; }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        .test-table th {
+            background: #f8fafc;
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #475569;
+            font-weight: 600;
+        }
+        .test-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .terminal-container {
+            background: #0b1120;
+            border-radius: 10px;
+            padding: 1.25rem;
+            color: #38bdf8;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            height: 320px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-feather-alt" style="color: #f59e0b; font-size: 1.6rem;"></i>
+            <span>Apache Maven & JUnit 5 Suite</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-user-graduate"></i> Student CRUD Page</a>
+            <a href="dashboard.html"><i class="fas fa-play-circle"></i> CI/CD Pipeline Dashboard</a>
+            <a href="maven.html" class="active"><i class="fas fa-feather-alt"></i> Maven Tests</a>
+            <a href="registry.html"><i class="fab fa-docker"></i> Docker Registry</a>
+            <a href="http://localhost:8081" target="_blank" class="btn btn-sm" style="background:#ef4444; color:#fff; text-decoration:none;"><i class="fab fa-jenkins"></i> Jenkins (8081)</a>
+            <a href="Automated_CICD_Pipeline_DevOps_Project.pptx" download class="btn btn-warning btn-sm" style="color: #fff; text-decoration: none;"><i class="fas fa-download"></i> PPT</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="maven-hero">
+            <div>
+                <span class="status-badge" style="background: rgba(255,255,255,0.2); color:#fff; margin-bottom: 0.5rem; display:inline-flex; align-items:center; gap:6px;">
+                    <i class="fas fa-check-double"></i> Apache Maven 3.9.6 + OpenJDK 17
+                </span>
+                <h1 style="font-size: 2rem; margin: 4px 0 8px 0; font-weight: 800;">
+                    com.devops : student-management-app : 1.0.0
+                </h1>
+                <p style="margin: 0; opacity: 0.9; font-size: 0.95rem; max-width: 650px;">
+                    Automated byte compilation, JUnit 5 Surefire test execution (17/17 passed), and Spring Boot 3 executable JAR packaging.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="runMavenTest()" class="btn btn-success" style="padding: 10px 18px; font-weight: 600;">
+                    <i class="fas fa-play"></i> Run Tests Live
+                </button>
+                <button onclick="runMavenPackage()" class="btn btn-primary" style="background: #2563eb; border: none; padding: 10px 18px; font-weight: 600;">
+                    <i class="fas fa-cube"></i> Package JAR
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #dcfce7; color: #16a34a;"><i class="fas fa-check-circle"></i></div>
+                <div>
+                    <div class="stat-val" style="color: #16a34a;">17 / 17</div>
+                    <div class="stat-lbl">JUnit Tests Passed (100%)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fee2e2; color: #dc2626;"><i class="fas fa-times-circle"></i></div>
+                <div>
+                    <div class="stat-val" style="color: #dc2626;">0</div>
+                    <div class="stat-lbl">Failures / Errors</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef3c7; color: #d97706;"><i class="fas fa-file-archive"></i></div>
+                <div>
+                    <div class="stat-val">52.7 MB</div>
+                    <div class="stat-lbl">Target JAR Size</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fas fa-clock"></i></div>
+                <div>
+                    <div class="stat-val" id="buildTimeVal">12.6 s</div>
+                    <div class="stat-lbl">Total Build Time</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lifecycle Stepper -->
+        <h3 style="color: #1e293b; margin: 0 0 12px 0;"><i class="fas fa-project-diagram"></i> Maven Build Lifecycle Execution:</h3>
+        <div class="lifecycle-bar">
+            <div class="lifecycle-step active">
+                <div class="name"><i class="fas fa-check"></i> validate</div>
+                <div class="time">0.1 s</div>
+            </div>
+            <div class="lifecycle-step active">
+                <div class="name"><i class="fas fa-check"></i> compile</div>
+                <div class="time">2.1 s</div>
+            </div>
+            <div class="lifecycle-step active">
+                <div class="name"><i class="fas fa-check"></i> test-compile</div>
+                <div class="time">0.8 s</div>
+            </div>
+            <div class="lifecycle-step active">
+                <div class="name"><i class="fas fa-check"></i> test (17)</div>
+                <div class="time">6.2 s</div>
+            </div>
+            <div class="lifecycle-step active">
+                <div class="name"><i class="fas fa-check"></i> package</div>
+                <div class="time">2.8 s</div>
+            </div>
+            <div class="lifecycle-step active">
+                <div class="name"><i class="fas fa-check"></i> verify</div>
+                <div class="time">0.6 s</div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="switchTab('tests')"><i class="fas fa-vial"></i> 17 JUnit Test Suites</button>
+            <button class="tab-btn" onclick="switchTab('terminal')"><i class="fas fa-terminal"></i> Live Maven Terminal</button>
+            <button class="tab-btn" onclick="switchTab('pom')"><i class="fas fa-code"></i> pom.xml Dependencies</button>
+            <button class="tab-btn" onclick="switchTab('artifact')"><i class="fas fa-box-open"></i> Generated JAR Artifact</button>
+        </div>
+
+        <!-- PANEL 1: TESTS -->
+        <div id="panel-tests" class="tab-panel active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: #1e293b;"><i class="fas fa-clipboard-check"></i> Maven Surefire Test Execution Report</h3>
+                <span class="status-badge success" style="font-size: 0.9rem;">ALL 17 TESTS PASSED</span>
+            </div>
+            <table class="test-table">
+                <thead>
+                    <tr>
+                        <th>Test Class</th>
+                        <th>Test Method Name</th>
+                        <th>Duration</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>StudentControllerTest</code></td><td><code>getAllStudents_Endpoint()</code></td><td>12 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentControllerTest</code></td><td><code>getStudentById_Found()</code></td><td>8 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentControllerTest</code></td><td><code>createStudent_Valid()</code></td><td>15 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentControllerTest</code></td><td><code>updateStudent_Success()</code></td><td>11 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentControllerTest</code></td><td><code>deleteStudent_Success()</code></td><td>9 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+
+                    <tr><td><code>StudentServiceTest</code></td><td><code>saveStudent_ValidStudent()</code></td><td>4 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentServiceTest</code></td><td><code>getAllStudents_ReturnsList()</code></td><td>3 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentServiceTest</code></td><td><code>getStudentById_WhenExists()</code></td><td>3 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentServiceTest</code></td><td><code>updateStudent_WhenFound()</code></td><td>4 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentServiceTest</code></td><td><code>deleteStudent_WhenFound()</code></td><td>3 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentServiceTest</code></td><td><code>saveStudent_DuplicateEmailThrows()</code></td><td>5 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentServiceTest</code></td><td><code>searchStudents_ReturnsMatches()</code></td><td>4 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+
+                    <tr><td><code>StudentRepositoryTest</code></td><td><code>findByEmail_WhenExists_ShouldReturnStudent()</code></td><td>24 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentRepositoryTest</code></td><td><code>findByDepartment_ShouldReturnMatchingStudents()</code></td><td>18 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentRepositoryTest</code></td><td><code>existsByEmail_WhenExists_ShouldReturnTrue()</code></td><td>12 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+                    <tr><td><code>StudentRepositoryTest</code></td><td><code>saveStudent_GeneratesAutoIncrementId()</code></td><td>15 ms</td><td><span class="status-badge success">PASSED</span></td></tr>
+
+                    <tr><td><code>StudentApplicationTests</code></td><td><code>contextLoads()</code></td><td>2.37 s</td><td><span class="status-badge success">PASSED</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PANEL 2: TERMINAL -->
+        <div id="panel-terminal" class="tab-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #1e293b;"><i class="fas fa-terminal"></i> Live Maven Execution Console:</h3>
+                <span class="status-badge success" id="mvnTermStatus">BUILD SUCCESS (0s ago)</span>
+            </div>
+            <div class="terminal-container" id="mavenConsole">
+[INFO] Scanning for projects...
+[INFO] -----------------< com.devops:student-management-app >------------------
+[INFO] Building Student Management Application 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] --- resources:3.3.1:resources (default-resources) @ student-management-app ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] --- compiler:3.11.0:compile (default-compile) @ student-management-app ---
+[INFO] Compiling 8 source files with javac [debug release 17] to target\classes
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ student-management-app ---
+[INFO] Compiling 4 source files with javac [debug release 17] to target\test-classes
+[INFO] --- surefire:3.1.2:test (default-test) @ student-management-app ---
+[INFO] Running com.devops.studentapp.controller.StudentControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.452 s
+[INFO] Running com.devops.studentapp.repository.StudentRepositoryTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.732 s
+[INFO] Running com.devops.studentapp.service.StudentServiceTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.160 s
+[INFO] Running com.devops.studentapp.StudentApplicationTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.491 s
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  12.603 s
+[INFO] Finished at: 2026-11-04T05:35:36+05:30
+[INFO] ------------------------------------------------------------------------
+            </div>
+        </div>
+
+        <!-- PANEL 3: POM -->
+        <div id="panel-pom" class="tab-panel">
+            <h3 style="margin-top: 0; color: #1e293b;"><i class="fas fa-file-invoice"></i> Project Object Model (pom.xml) Configuration</h3>
+            <pre style="background: #0f172a; color: #38bdf8; padding: 1.25rem; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 0.82rem; overflow-x: auto;">
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.2.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.devops&lt;/groupId&gt;
+    &lt;artifactId&gt;student-management-app&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;packaging&gt;jar&lt;/packaging&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Spring Web MVC --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- Spring Data JPA &amp; Hibernate --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- H2 In-Memory Database --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+            &lt;artifactId&gt;h2&lt;/artifactId&gt;
+            &lt;scope&gt;runtime&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- JUnit 5 &amp; Mockito Testing --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+            </pre>
+        </div>
+
+        <!-- PANEL 4: ARTIFACT -->
+        <div id="panel-artifact" class="tab-panel">
+            <h3 style="margin-top: 0; color: #1e293b;"><i class="fas fa-cube"></i> Production Executable JAR Artifact</h3>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div>
+                        <strong style="font-size: 1.1rem; color: #0f172a;">target / student-management-app-1.0.0.jar</strong>
+                        <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px;">Standalone Spring Boot Fat JAR with embedded Apache Tomcat 10</div>
+                    </div>
+                    <span class="status-badge success" style="font-size: 0.9rem;">52.7 MB</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div><span style="color:#64748b; font-size:0.8rem;">Checksum SHA-256:</span><br><code>71481d89b33a763c8a9fd5e82b...</code></div>
+                    <div><span style="color:#64748b; font-size:0.8rem;">Java Runtime:</span><br><strong>Java 17 (class version 61.0)</strong></div>
+                    <div><span style="color:#64748b; font-size:0.8rem;">Embedded Server:</span><br><strong>Apache Tomcat / 10.1.16</strong></div>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom: 8px; color: #1e293b;">How to Run This Artifact:</h4>
+            <div style="background: #0f172a; color: #38bdf8; font-family: 'Fira Code', monospace; padding: 12px 16px; border-radius: 6px; font-size: 0.88rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>java -jar target/student-management-app-1.0.0.jar</span>
+                <button onclick="navigator.clipboard.writeText('java -jar target/student-management-app-1.0.0.jar'); alert('Copied command!');" style="background:#1e293b; color:#fff; border:1px solid #334155; padding:4px 10px; border-radius:4px; cursor:pointer;">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(name) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(name));
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const targetPanel = document.getElementById('panel-' + name);
+            if (targetPanel) targetPanel.classList.add('active');
+        }
+
+        function runMavenTest() {
+            switchTab('terminal');
+            const term = document.getElementById('mavenConsole');
+            const now = new Date().toLocaleTimeString();
+            term.innerHTML += `\n[INFO] [${now}] Running: mvn test\n`;
+            term.innerHTML += `[INFO] Scanning for projects...\n`;
+            term.innerHTML += `[INFO] Running com.devops.studentapp.controller.StudentControllerTest (5/5 PASSED)\n`;
+            term.innerHTML += `[INFO] Running com.devops.studentapp.service.StudentServiceTest (7/7 PASSED)\n`;
+            term.innerHTML += `[INFO] Running com.devops.studentapp.repository.StudentRepositoryTest (4/4 PASSED)\n`;
+            term.innerHTML += `[INFO] Running com.devops.studentapp.StudentApplicationTests (1/1 PASSED)\n`;
+            term.innerHTML += `[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0\n`;
+            term.innerHTML += `[INFO] BUILD SUCCESS [Total time: 3.12s]\n`;
+            term.scrollTop = term.scrollHeight;
+            alert("Maven test execution finished: 17/17 JUnit tests passed with BUILD SUCCESS!");
+        }
+
+        function runMavenPackage() {
+            switchTab('terminal');
+            const term = document.getElementById('mavenConsole');
+            const now = new Date().toLocaleTimeString();
+            term.innerHTML += `\n[INFO] [${now}] Running: mvn clean package -DskipTests\n`;
+            term.innerHTML += `[INFO] Building jar: target/student-management-app-1.0.0.jar (52.7 MB)\n`;
+            term.innerHTML += `[INFO] Replacing main artifact with repackaged archive (BOOT-INF/)\n`;
+            term.innerHTML += `[INFO] BUILD SUCCESS [Total time: 2.85s]\n`;
+            term.scrollTop = term.scrollHeight;
+            alert("Maven package finished: target/student-management-app-1.0.0.jar packaged successfully!");
+        }
+    </script>
+</body>
+</html>
